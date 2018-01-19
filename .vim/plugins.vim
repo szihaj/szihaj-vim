@@ -15,7 +15,7 @@ Plugin 'arnaud-lb/vim-php-namespace'
 Plugin 'stephpy/vim-php-cs-fixer'
 Plugin 'lambdalisue/vim-fullscreen'
 Plugin 'gregsexton/MatchTag'
-Plugin 'Yggdroot/indentLine'
+Plugin 'vim-airline/vim-airline'
 
 " ------ Colors
 Plugin 'zeis/vim-kolor'
