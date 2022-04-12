@@ -5,12 +5,13 @@ so ~/.vim/plugins.vim
 
 syntax enable
 
-"colorscheme darktango
-"colorscheme atom-dark-256
-colorscheme material-theme
-set guifont=Fira\ Mono\ for\ Powerline:h14
-set linespace=20
+colorscheme nord
+set guifont=Cascadia\ Code\ Semi-Bold\ 11
+set linespace=14
 set laststatus=2
+set autoindent
+set colorcolumn=120
+set background=dark
 
 set backspace=indent,eol,start
 let mapleader = ','
@@ -20,6 +21,21 @@ set expandtab
 set softtabstop=4
 set shiftwidth=4
 set smartindent
+set belloff=all
+
+set shell=/bin/bash
+
+if !&scrolloff
+  set scrolloff=1
+endif
+
+hi MatchParen cterm=underline ctermbg=none ctermfg=green
+
+"---------------------------- macro ---
+let @p = 'diwh"0p'
+
+"---------------------------- SWAP files ---
+:set directory=$HOME/.vim/swapfiles//
 
 "---------------------------- Encoding fixes ---"
 set encoding=utf-8
@@ -44,7 +60,7 @@ let g:php_cs_fixer_cache = ".php_cs.cache" " options: --cache-file
 let g:php_cs_fixer_config_file = '.php_cs' " options: --config
 " End of php-cs-fixer version 2 config params
 
-let g:php_cs_fixer_path = "/home/szihaj/.composer/vendor/bin/php-cs-fixer"
+let g:php_cs_fixer_path = "~/.composer/vendor/bin/php-cs-fixer"
 let g:php_cs_fixer_php_path = "php"               " Path to PHP
 let g:php_cs_fixer_enable_default_mapping = 1     " Enable the mapping by default (<leader>pcd)
 let g:php_cs_fixer_dry_run = 0                    " Call command with dry-run option
@@ -53,21 +69,41 @@ let g:php_cs_fixer_verbose = 0                    " Return the output of command
 set hlsearch
 set incsearch
 
+let g:snipMate = { 'snippet_version' : 1 }
+
 "----------------------------------Mappings---"
 nmap <Leader>ev :tabedit $MYVIMRC<cr>
-nmap <Leader>epl :e ~/.vim/plugins.vim<cr>
+nmap <Leader>epl :tabedit ~/.vim/plugins.vim<cr>
 nmap <Leader>eps :tabedit ~/.vim/snippets/php.snippets<cr>
 
 nmap <Leader><space> :nohlsearch<cr>
 nmap <Leader>nt :NERDTreeToggle<cr>
+nmap <A-1> :NERDTreeToggle<cr>
 nmap <c-R> :CtrlPBufTag<cr>
 nmap <c-O> :CtrlPMRUFiles<cr>
 
-nnoremap <silent><Leader>pf :call PhpCsFixerFixFile()<cr>
+" nnoremap <silent><Leader>pf :call PhpCsFixerFixFile()<cr>
+" tnoremap <c-j> <C-W>:q!<CR>
+" nnoremap <c-j> :terminal<CR><c-w>_
+" nmap <Leader>t :terminal<CR><c-w>_
+
+nnoremap <C-Left> :tabprevious<cr>
+nnoremap <C-Right> :tabnext<cr>
+nnoremap <C-Down> :tabclose<cr>
+" nnoremap <C-w> :bd<cr>
+nnoremap <Leader>t :term ++close<cr>
+tmap <Leader>t <c-w>:term ++close<cr>
+
+nnoremap <C-S-F> :Ag 
 
 map <F8> "+gP
 
 nmap <C-s> :w<cr>
+nmap <C-i> :bd<cr>
+
+" autocmd FileType php :set ft=php
+" autocmd FileType php :set syn=php
+
 "-------------------------------------Splits---"
 set splitbelow
 set splitright
@@ -85,6 +121,8 @@ set guioptions-=R
 "set guioptions=-b
 "set guioptions=-h
 set guioptions-=e
+set guioptions-=T
+set guioptions-=m
 
 function! IPhpInsertUse()
     call PhpInsertUse()
@@ -94,10 +132,16 @@ autocmd FileType php inoremap <Leader>n <Esc>:call IPhpInsertUse()<CR>
 autocmd FileType php noremap <Leader>n :call PhpInsertUse()<CR>
 
 "--------------------------------CtrlP-conf---"
+let g:ctrlp_match_window = 'top,order:ttb,min:1,max:20,results:20'
+let g:ctrlp_working_path_mode = ''
+
 " let g:ctrlp_custom_ignore = 'a\b\c|d'
-let g:ctrlp_match_window = 'top,order:ttb,min:1,max:30,results:30'
+" let g:ctrlp_extensions = ['buffertag']
 
 let NERDTreeHijackNetrw = 0
+
+"--------------------------------Commentray---
+autocmd FileType php setlocal commentstring=//\ %s
 
 "--------------------------------Auto sourcing this file---
 augroup autosourcing
@@ -105,7 +149,7 @@ augroup autosourcing
 	autocmd BufWritePost .vimrc source %
 augroup END
 
-augroup autocsfix
-    autocmd!
-    autocmd BufWritePost !/home/szihaj/.composer/vendor/bin/php-cs-fixer <afile>
-augroup END
+" augroup autocsfix
+"     autocmd!
+"     autocmd BufWritePost !/home/szihaj/.composer/vendor/bin/php-cs-fixer <afile>
+" augroup END
