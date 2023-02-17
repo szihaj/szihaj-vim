@@ -1,3 +1,5 @@
+" *n/N -> cgn [...] -> ..
+set nocompatible
 let mapleader=","
 set number
 set ts=4
@@ -5,6 +7,11 @@ set shiftwidth=4
 set ai sw=4
 set expandtab
 set cursorline
+set list
+set ignorecase
+set smartcase
+set mouse=
+set path+=**
 
 if !&scrolloff
     set scrolloff=2
@@ -12,6 +19,7 @@ endif
 
 let g:ctrlp_working_path_mode = ''
 let NERDTreeShowHidden=1
+let g:fzf_preview_window = ['down:90%', 'ctrl-w']
 
 " Powerline
 " let g:airline_powerline_fonts = 1
@@ -21,12 +29,13 @@ let NERDTreeShowHidden=1
 
 "----------------------------------Mappings---"
 nmap <Leader>ev :tabedit $MYVIMRC<cr>
+nmap <Leader>es :tabedit ~/.config/nvim/UltiSnips/<cr>
 nmap <Leader>epl :tabedit ~/.vim/plugins.vim<cr>
 nmap <Leader>eps :tabedit ~/.vim/snippets/php.snippets<cr>
 
 nmap <Leader><space> :nohlsearch<cr>
 nmap <Leader>nt :NERDTreeToggle<cr>
-nmap <A-1> :NERDTreeToggle<cr>
+nmap <Leader>1 :NERDTreeToggle<cr>
 nmap <c-R> :CtrlPBufTag<cr>
 nmap <c-O> :CtrlPMRUFiles<cr>
 
@@ -38,23 +47,31 @@ nnoremap <C-Down> :tabclose<cr>
 nnoremap <Leader>t :split<cr>:term<cr>
 tmap <Leader>t <c-w>:term ++close<cr>
 tnoremap <Esc> <C-\><C-n>
-                                                                                                                        
+
 nnoremap <Leader>s :!php -l %<cr>
+nnoremap <Leader>S :!php %<cr>
 nnoremap <Leader>m :MarkdownPreview<cr>
 nnoremap <Leader>d <C-]>
 nnoremap <Leader>b <C-T>
 nnoremap <Leader>i :PhpactorImportClass<cr>
 nnoremap <Leader>r :PhpactorFindReferences<cr>
-                                                                                                                        
-nnoremap <C-S-F> :Ag 
+
+nnoremap <C-F> :Ag 
 nnoremap <Leader>R :redo<cr> 
 
 map <F8> "+gP
 
 nmap <C-s> :w<cr>
-nmap <C-i> :bd<cr>
+nmap <C-i> :bd!<cr>
+nmap <Leader>ex :Exec<cr>
+nnoremap <Leader>f :!prettier -w %<cr>
 
-"-------------------------------------Splits---"                                                                        
+inoremap {<CR> {<CR>}<C-o>O
+
+" sudo write
+cmap w!! w !sudo tee > /dev/null %
+
+"-------------------------------------Splits---
 set splitbelow
 set splitright
 
@@ -88,28 +105,58 @@ call plug#begin('~/.config/nvim/plugged')
     Plug 'tpope/vim-commentary'
     Plug 'scrooloose/nerdtree'
     Plug 'vim-airline/vim-airline'
-    Plug 'junegunn/fzf'                                                                                                   
-    Plug 'junegunn/fzf.vim'                                                                                               
+    Plug 'junegunn/fzf'
+    Plug 'junegunn/fzf.vim'
     Plug 'mattn/emmet-vim'
-    Plug 'stanbsky/wp-hook-finder'
-    
+    Plug 'fladson/vim-kitty'
+
     Plug 'kaicataldo/material.vim'
     Plug 'NLKNguyen/papercolor-theme'
     Plug '4513ECHO/vim-colors-hatsunemiku'
     Plug 'sainnhe/everforest'
     Plug 'arcticicestudio/nord-vim'
     Plug 'kyazdani42/nvim-web-devicons'
+    Plug 'axvr/photon.vim'
+    Plug 'challenger-deep-theme/vim'
+    Plug 'KabbAmine/yowish.vim'
+    Plug 'catppuccin/nvim'
+
+    Plug 'lukas-reineke/indent-blankline.nvim'
+    Plug 'jandamm/vim-projplugin'
 
     Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']}
+    Plug 'jwalton512/vim-blade'
+
+    Plug 'terryma/vim-multiple-cursors'
+
+    Plug 'w0rp/ale'
 call plug#end()
 
+" -- eslint
+let g:ale_fixers = {
+ \ 'javascript': ['eslint']
+ \ }
+ 
+let g:ale_sign_error = '❌'
+let g:ale_sign_warning = '⚠️'
+let g:ale_echo_msg_error_str = 'E'
+let g:ale_echo_msg_warning_str = 'W'
+let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
+" nmap <silent> <C-k> <Plug>(ale_previous_wrap)
+" nmap <silent> <C-j> <Plug>(ale_next_wrap)
+
+" let g:ale_fix_on_save = 1
+
+" -- SNIPPETS
 let g:UltiSnipsExpandTrigger="<c-j>"
 let g:UltiSnipsJumpForwardTrigger="<c-j>"
 let g:UltiSnipsJumpBackwardTrigger="<c-b>"
+"set runtimepath+=~/.config/nvim/snippets/
 
 " WP
-nnoremap <Leader>f :FindWPHook<CR>
-nnoremap <Leader>F :FindWPHookDef<CR>
+" nnoremap <Leader>f :FindWPHook<CR>
+" nnoremap <Leader>F :FindWPHookDef<CR>
+" nnoremap <Leader>f :find 
 
 " PHP7
 let g:ultisnips_php_scalar_types = 1
@@ -132,10 +179,10 @@ inoremap <expr> <s-tab> pumvisible() ? "\<c-p>" : "\<TAB>"
     " context-aware menu with all functions (ALT-m)
     nnoremap <m-m> :call phpactor#ContextMenu()<cr>
     nnoremap <m-h> :call phpactor#Hover()<cr>
-    
+
     nnoremap gd :call phpactor#GotoDefinition()<CR>
     nnoremap gr :call phpactor#FindReferences()<CR>
-    
+
     " Extract method from selection
     vmap <silent><Leader>em :<C-U>call phpactor#ExtractMethod()<CR>
     " extract variable
@@ -151,13 +198,31 @@ inoremap <expr> <s-tab> pumvisible() ? "\<c-p>" : "\<TAB>"
         execute l:cmd
     endfunction
 
-colorscheme nord
-" set termguicolors
+set termguicolors
+" colorscheme yowish
+" colorscheme PaperColor
+colorscheme catppuccin-mocha
 " let g:airline_theme = 'hatsunemiku'
+
+" --------------------------- search ---
+" count nr of occurrences of word under cursor
+nnoremap <leader>c :%s/<c-r><c-w>//gn<cr>
+
+" count nr of occurrences of visual selection
+vnoremap <leader>c :<c-u>%s/<c-r>*//gn<cr>
 
 "---------------------------- macro ---
 let @p = 'diwh"0p'
 
 "--------------------------------Commentray---
 autocmd FileType php setlocal commentstring=//\ %s
+
+"---------------------------------------curl---
+command! Exec set splitright | vnew | set filetype=sh | read !sh #
+
+"--------------------------------Auto sourcing this file---
+augroup autosourcing
+    autocmd!
+    autocmd BufWritePost init.vim source %
+augroup END
 
